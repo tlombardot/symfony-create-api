@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\City;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -47,8 +49,33 @@ class AppFixtures extends Fixture
         $camille->setPassword($hashedPassword);
         $manager->persist($camille);
 
-        $manager->flush();
-
         #endregion User
+
+        #region City
+
+        $cities = [
+            "Paris",
+            "Lyon",
+            "Marseille",
+            "Bordeaux",
+            "Lille",
+            "Strasbourg",
+            "Toulouse",
+            "Nantes",
+            "Dijon",
+            "Brest",
+        ];
+
+        foreach ($cities as $cityName) {
+            $city = new City()
+                ->setName($cityName)
+                ->setCreatedAt(new DateTimeImmutable());
+
+            $manager->persist($city);
+        }
+
+        #endregion City
+
+        $manager->flush();
     }
 }
