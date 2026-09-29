@@ -23,10 +23,8 @@ class CityRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         if ($query) {
-            $qb->where("LOWER(c.name) LIKE LOWER(:query)")->setParameter(
-                "query",
-                "%" . $query . "%",
-            );
+            $qb->where("LOWER(c.name) LIKE LOWER(:query)")
+                ->setParameter("query", "%" . $query . "%");
         }
 
         return $qb->getQuery()->getResult();
