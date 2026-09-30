@@ -1,6 +1,6 @@
 api_platform:
     title: CATAPULT CONNECT
-    version: 1.0.0
+    version: 0.0.1
     defaults:
         stateless: true
         cache_headers:
@@ -14,3 +14,5 @@ api_platform:
         html: ["text/html"]
     error_formats:
         jsonproblem: ["application/problem+json"]
+    # exception_to_status:
+    #     App\Exception\User\EmailAlreadyUsedException: 409
