@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation;
 use App\DTO\City\CityListOutput;
 use App\Entity\Impl\AbstractEntity;
 use App\Repository\CityRepository;
@@ -19,6 +20,9 @@ use Symfony\Component\Uid\Uuid;
                 provider: CityCollectionProvider::class,
                 output: CityListOutput::class,
                 paginationClientEnabled: false,
+                openapi: new Operation(
+                    security: []
+                ),
                 parameters: [
                     "q" => new QueryParameter(
                         description: "Filtre textuel sur le nom de la ville. Insensible à la case et aux accents",

@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
-use App\DTO\User\UserDetailsOutput\UserDetailsOutput;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\OpenApi\Model\Operation;
+use App\DTO\User\UserDetailsOutput;
 use App\DTO\User\UserRegisterInput;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +14,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 use App\Entity\Impl\AbstractEntity;
+use App\State\User\UserMeProvider;
 use App\State\User\UserRegisterProcessor;
 
 #[ApiResource(
@@ -21,6 +24,16 @@ use App\State\User\UserRegisterProcessor;
             input: UserRegisterInput::class,
             output: UserDetailsOutput::class,
             processor: UserRegisterProcessor::class,
+            openapi: new Operation(
+                security: []
+            )
+        ),
+        new Get(
+            uriTemplate: '/users/me',
+            uriVariables: [],
+            output: UserDetailsOutput::class,
+            provider: UserMeProvider::class,
+            security: "is_granted('ROLE_USER')",
         )
     ]
 )]

@@ -3,7 +3,7 @@
 
 namespace App\Service;
 
-use App\DTO\User\UserDetailsOutput\UserDetailsOutput;
+use App\DTO\User\UserDetailsOutput;
 use App\DTO\User\UserRegisterInput;
 use App\Entity\User;
 use App\Exception\User\EmailAlreadyUsedException;

@@ -9,3 +9,11 @@
 
 controllers:
     resource: routing.controllers
+
+auth_login:
+    path: /api/auth/login
+    methods: POST
+
+refresh_token:
+    path: /api/auth/refresh
+    methods: POST
