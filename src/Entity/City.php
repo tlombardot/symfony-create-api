@@ -13,8 +13,7 @@ use App\State\City\CityCollectionProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
-#[
-    ApiResource(
+#[ApiResource(
         operations: [
             new GetCollection(
                 provider: CityCollectionProvider::class,
