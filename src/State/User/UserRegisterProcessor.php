@@ -4,7 +4,7 @@ namespace App\State\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\DTO\User\UserDetailsOutput\UserDetailsOutput;
+use App\DTO\User\UserDetailsOutput;
 use App\Service\UserService;
 
 class UserRegisterProcessor implements ProcessorInterface

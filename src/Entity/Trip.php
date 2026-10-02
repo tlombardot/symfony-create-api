@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\DTO\Trip\TripListOutput;
+use App\DTO\Trip\TripSearchInput;
 use App\Entity\Enum\CatapultModel;
 use App\Entity\Impl\AbstractEntity;
 use App\Repository\TripRepository;
@@ -9,7 +13,44 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use App\State\Trip\TripSearchProcessor;
+use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
+use App\DTO\Trip\TripDetailsOutput;
+use ApiPlatform\Metadata\Get;
+use App\State\Trip\TripItemProvider;
 
+#[ApiResource(operations: [
+    new Post(
+        uriTemplate: '/trips/search',
+        // un Post répond 201 par défaut : cette recherche ne crée rien, le contrat n'y déclare qu'un 200
+        status: 200,
+        input: TripSearchInput::class,
+        output: TripListOutput::class,
+        processor: TripSearchProcessor::class,
+        // on cherche un lancer sans être connecté : le contrat déclare l'opération publique
+        openapi: new OpenApiOperation(
+            security: [],
+            // le générateur déduit la réponse du `output:`, qui nomme une classe et non un tableau :
+            // il annonce un objet unique là où l'API rend une liste. On corrige la documentation.
+            responses: ['200' => new OpenApiResponse(
+                description: 'Les lancers disponibles',
+                content: new \ArrayObject(['application/json' => ['schema' => [
+                    'type' => 'array',
+                    // le nom relevé au point 3, pas celui que le contrat écrit
+                    'items' => ['$ref' => '#/components/schemas/Trip.TripListOutput'],
+                ]]]),
+            )],
+        ),
+    ),
+    new Get(
+        uriTemplate: '/trips/{id}',
+        output: TripDetailsOutput::class,
+        provider: TripItemProvider::class,
+        // on consulte un lancer sans être connecté : le contrat déclare l'opération publique
+        openapi: new OpenApiOperation(security: []),
+    ),
+])]
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 class Trip extends AbstractEntity
 {
@@ -54,26 +95,16 @@ class Trip extends AbstractEntity
         $this->id = Uuid::v7();
     }
 
-    /**
-     * @return Uuid
-     */
     public function getId(): Uuid
     {
         return $this->id;
     }
 
-    /**
-     * @return City|null
-     */
     public function getOrigin(): ?City
     {
         return $this->origin;
     }
 
-    /**
-     * @param City|null $origin
-     * @return $this
-     */
     public function setOrigin(?City $origin): static
     {
         $this->origin = $origin;
@@ -81,18 +112,11 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return City|null
-     */
     public function getDestination(): ?City
     {
         return $this->destination;
     }
 
-    /**
-     * @param City|null $destination
-     * @return $this
-     */
     public function setDestination(?City $destination): static
     {
         $this->destination = $destination;
@@ -100,18 +124,12 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeImmutable|null
-     */
     public function getDepartureAt(): ?\DateTimeImmutable
     {
         return $this->departureAt;
     }
 
-    /**
-     * @param \DateTimeImmutable $departureAt
-     * @return $this
-     */
+
     public function setDepartureAt(\DateTimeImmutable $departureAt): static
     {
         $this->departureAt = $departureAt;
@@ -119,18 +137,13 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
+
     public function getDuration(): ?int
     {
         return $this->duration;
     }
 
-    /**
-     * @param int $duration
-     * @return $this
-     */
+
     public function setDuration(int $duration): static
     {
         $this->duration = $duration;
@@ -138,18 +151,13 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
+
     public function getPrice(): ?int
     {
         return $this->price;
     }
 
-    /**
-     * @param int $price
-     * @return $this
-     */
+
     public function setPrice(int $price): static
     {
         $this->price = $price;
@@ -157,18 +165,13 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return CatapultModel|null
-     */
+
     public function getCatapultModel(): ?CatapultModel
     {
         return $this->catapultModel;
     }
 
-    /**
-     * @param CatapultModel $catapultModel
-     * @return $this
-     */
+
     public function setCatapultModel(CatapultModel $catapultModel): static
     {
         $this->catapultModel = $catapultModel;
@@ -176,18 +179,13 @@ class Trip extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
+
     public function getBoardingInfo(): ?string
     {
         return $this->boardingInfo;
     }
 
-    /**
-     * @param string $boardingInfo
-     * @return $this
-     */
+
     public function setBoardingInfo(string $boardingInfo): static
     {
         $this->boardingInfo = $boardingInfo;
