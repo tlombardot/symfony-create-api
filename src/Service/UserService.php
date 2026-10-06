@@ -30,9 +30,14 @@ class UserService{
             createdAt: $user->getCreatedAt(),
         );
     }
+    public function findOnebyEmail(string $email): ?User{
+        return $this->userRepository->findOneByEmail($email);
+    }
+
+
     public function register(UserRegisterInput $input): User
     {
-        if ($this->userRepository->findOneByEmail($input->email)) {
+        if ($this->findOnebyEmail($input->email)) {
             $this->domainLogger->error('User registration - conflict : email already used');
             throw new EmailAlreadyUsedException();
         }

@@ -4,7 +4,7 @@ namespace App\State\City;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Dto\City\CityListOutput;
+use App\DTO\City\CityListOutput;
 use App\Service\CityService;
 
 class CityCollectionProvider implements ProviderInterface

@@ -4,7 +4,7 @@ namespace App\DTO\Trip;
 
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Uid\Uuid;
-use App\Dto\City\CityListOutput;
+use App\DTO\City\CityListOutput;
 use DateTimeImmutable;
 
 final class TripDetailsOutput extends TripListOutput{

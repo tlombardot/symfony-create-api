@@ -4,8 +4,8 @@ namespace App\State\Trip;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Dto\Trip\TripListOutput;
-use App\Dto\Trip\TripSearchInput;
+use App\DTO\Trip\TripListOutput;
+use App\DTO\Trip\TripSearchInput;
 use App\Service\TripService;
 
 /**

@@ -3,7 +3,7 @@
 namespace App\DTO\Trip;
 
 use ApiPlatform\Metadata\ApiProperty;
-use App\Dto\City\CityListOutput;
+use App\DTO\City\CityListOutput;
 use Symfony\Component\Uid\Uuid;
 
 // pas de `final` : TripDetailsOutput hérite de cette classe pour ajouter les champs du détail

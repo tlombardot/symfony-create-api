@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\DTO\Trip\TripDetailsOutput;
 use App\Service\TripService;
-use Override;
 
 final class TripItemProvider implements ProviderInterface
 {
