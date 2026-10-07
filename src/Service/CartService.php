@@ -5,11 +5,14 @@ namespace App\Service;
 use App\DTO\Cart\CartAddLineInput;
 use App\DTO\Cart\CartDetailsOutput;
 use App\DTO\Cart\CartLineOutput;
+use App\DTO\Cart\CartPayOutput;
 use App\Entity\Cart;
 use App\Entity\CartItem;
 use App\Entity\Enum\CartStatus;
+use App\Entity\Ticket;
 use App\Entity\User;
 use App\Exception\Cart\CartAlreadyPaidException;
+use App\Exception\Cart\CartEmptyException;
 use App\Exception\Cart\CartLineNotFoundException;
 use App\Exception\Cart\CartNotFoundException;
 use App\Exception\Trip\TripNotFoundException;
@@ -23,6 +26,7 @@ class CartService{
         private TripService $tripService,
         private CartRepository $cartRepository,
         private AuditService $audit,
+        private TicketService $ticketService
     ){
     }
 
@@ -150,5 +154,56 @@ class CartService{
         }
 
         $this->cartRepository->flush();
+    }
+
+    /**
+     * Pays this cart: issues its tickets and marks it as paid, in a single write.
+     *
+     * @return Ticket[] the tickets issued
+     *
+     * @throws CartAlreadyPaidException when the cart has already been paid
+     * @throws CartEmptyException       when the cart carries no line
+     */
+    public function pay(Cart $cart): array{
+
+        if($cart->getStatus() === CartStatus::Paid){
+            throw new CartAlreadyPaidException();
+        }
+
+        if($cart->getItems()->isEmpty()){
+            throw new CartEmptyException();
+        }
+
+        $tickets = $this->ticketService->issue($cart);
+
+        $cart->setStatus(CartStatus::Paid);
+
+        $this->audit->stampUpdate($cart);
+
+        $this->cartRepository->flush();
+
+        return $tickets;
+    }
+
+    /**
+     * Returns the confirmation reference of this cart, derived from its identity.
+     */
+    public function confirmationOf(Cart $cart): string{
+
+        $suffix = strtoupper(substr($cart->getId()->toRfc4122(), -6));
+        return sprintf('ONTB-%s-%s' , $cart->getCreatedAt()->format('Y'), $suffix);
+    }
+
+    /**
+     * Maps a paid cart and its tickets onto the payload served by the payment endpoint.
+     *
+     * @param Ticket[] $tickets
+     */
+    public function toPayment(Cart $cart, array $tickets): CartPayOutput{
+
+        return new CartPayOutput(
+            confirmation: $this->confirmationOf($cart),
+            tickets: array_map($this->ticketService->toList(...), $tickets),
+        );
     }
 }

@@ -23,7 +23,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
-
+use App\DTO\Cart\CartPayInput;
+use App\DTO\Cart\CartPayOutput;
+use App\State\Cart\CartPayProcessor;
 
 #[ApiResource(operations: [
     new Post(
@@ -80,6 +82,15 @@ use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
         openapi: new OpenApiOperation(
             summary: 'Removes a line from the cart',
         ),
+    ),
+    new Post(
+        uriTemplate: '/carts/{id}/pay',
+        input: CartPayInput::class,
+        output: CartPayOutput::class,
+        provider: CartProvider::class,
+        processor: CartPayProcessor::class,
+        security: "object.getCreatedBy() == user",
+        status: 200,
     ),
 ])]
 #[ORM\Entity(repositoryClass: CartRepository::class)]
