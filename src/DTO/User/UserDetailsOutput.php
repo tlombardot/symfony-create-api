@@ -48,5 +48,12 @@ class UserDetailsOutput{
             "example" => "2023-07-12T14:30:00+00:00"
         ])]
         public DateTimeImmutable $createdAt,
+        #[ApiProperty(schema: [
+            "type" => "string",
+            "description" => "L'adresse signé de la photo de profil, valant quinze minutes",
+            "format" => "url",
+            "nullable" => "true"
+        ])]
+        public null|string $profilePictureUrl,
     ){}
 }

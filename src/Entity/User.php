@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use App\DTO\User\UserDetailsOutput;
 use App\DTO\User\UserRegisterInput;
 use App\Repository\UserRepository;
@@ -15,6 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 use App\Entity\Impl\AbstractEntity;
 use App\State\User\UserMeProvider;
+use App\State\User\UserProfilePictureProcessor;
 use App\State\User\UserRegisterProcessor;
 
 #[ApiResource(
@@ -34,7 +36,29 @@ use App\State\User\UserRegisterProcessor;
             output: UserDetailsOutput::class,
             provider: UserMeProvider::class,
             security: "is_granted('ROLE_USER')",
-        )
+        ),
+        new Post(
+            uriTemplate: '/users/me/profile-picture',
+            deserialize: false,
+            inputFormats: ['multipart' => ['multipart/form-data']],
+            output: UserDetailsOutput::class,
+            processor: UserProfilePictureProcessor::class,
+            security: "is_granted('ROLE_USER')",
+            openapi: new Operation(
+                summary: 'Update profile picture',
+                requestBody: new RequestBody(
+                    description: 'La nouvelle photo de profil',
+                    content: new \ArrayObject([
+                        'multipart/form-data' => ['schema' => [
+                            'type' => 'object',
+                            'properties' => ['file' => ['type' => 'string', 'format' => 'binary']],
+                            'required' => ['file'],
+                        ]],
+                    ]),
+                    required: true,
+                ),
+            ),
+        ),
     ]
 )]
 
@@ -69,6 +93,9 @@ class User extends AbstractEntity implements
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastName = null;
+
+    #[ORM\ManyToOne]
+    private ?Document $profilePicture = null;
 
     public function __construct()
     {
@@ -173,6 +200,18 @@ class User extends AbstractEntity implements
     public function setLastName(?string $lastName): static
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?Document
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?Document $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }
